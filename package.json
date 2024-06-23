@@ -1,0 +1,20 @@
+{
+  "name": "nodejs-user-handler",
+  "version": "1.0.0",
+  "description": "Open source backend for handling user sign in and sign out with node js and postgres",
+  "main": "app.js",
+  "scripts": {
+    "dev": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MDIVS/node-js-user-handler.git"
+  },
+  "author": "MDIVS",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MDIVS/node-js-user-handler/issues"
+  },
+  "homepage": "https://github.com/MDIVS/node-js-user-handler#readme"
+}
