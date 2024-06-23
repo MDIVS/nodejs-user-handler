@@ -4,7 +4,7 @@
   "description": "Open source backend for handling user sign in and sign out with node js and postgres",
   "main": "app.js",
   "scripts": {
-    "dev": "node app.js",
+    "dev": "node --env-file=config/.env.dev app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

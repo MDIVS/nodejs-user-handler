@@ -2,4 +2,6 @@
 
 # Development process
 
-First things first, start by [creating a node project](CREATING_NODE_PROJECT.md).
+1. [Create your node project](CREATING_NODE_PROJECT.md).
+
+2. [Setup enviroment file](SETUP_ENVIROMENT_FILE.md).
