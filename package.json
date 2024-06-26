@@ -16,5 +16,10 @@
   "bugs": {
     "url": "https://github.com/MDIVS/node-js-user-handler/issues"
   },
-  "homepage": "https://github.com/MDIVS/node-js-user-handler#readme"
+  "homepage": "https://github.com/MDIVS/node-js-user-handler#readme",
+  "dependencies": {
+    "pg": "^8.12.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.3"
+  }
 }
