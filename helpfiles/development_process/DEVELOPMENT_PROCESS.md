@@ -11,3 +11,5 @@
 4. Use the [Setup Postgres within Docker](./db/docker/SETUP_POSTGRES_WITHIN_DOCKER.md) guide.
 
 5. [Connect with Postgres](./db/POSTGRES.md).
+
+6. [Create a hapi server](./CREATE_HAPI_SERVER.md)

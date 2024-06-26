@@ -1,13 +1,23 @@
-if (!process.env.ENV_NAME) throw new Error('No enviroment detected, check if you are running the application using "npm run" command.');
-console.log(`Node Js User Handler (${process.env.ENV_NAME})`);
+[back to devlopment process](./DEVELOPMENT_PROCESS.md)
 
-const Postgres = require('./src/db/postgres');
+# Create a hapi server
+Hapi is a powerful and flexible Node. js framework for building web applications and APIs.
 
+First, npm install hapi:
+```
+npm i @hapi/hapi
+```
+
+Setup a server port in your enviroment file:
+```
+PORT=5000
+```
+
+Then create your hapi server:
+```
 const Hapi = require('@hapi/hapi');
 
-async function main() {
-    let connection = await Postgres.connect();
-
+const init = async () => {
     const server = Hapi.server({
         port: process.env.PORT,
         host: 'localhost'
@@ -30,4 +40,5 @@ process.on('unhandledRejection', (err) => {
     process.exit(1);
 });
 
-module.exports = main();
+init();
+```
