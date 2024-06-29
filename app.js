@@ -15,14 +15,32 @@ async function main() {
         port: process.env.PORT,
         host: 'localhost'
     });
-
-    server.route({
-        method: 'GET',
-        path: '/',
-        handler: (request, h) => {
-            return 'Hello World!';
+    
+    server.route([
+        {
+            method: 'POST',
+            path: '/user',
+            options: {
+                description: 'Creates user in database',
+                handler: async (request) => {
+                    const { record } = request.payload;
+                    let new_record = await connection.models.User.create(record);
+                    
+                    return {
+                        message: 'Record successfully commited to database.',
+                        record: new_record
+                    };
+                }
+            }
+        },
+        {
+            method: 'GET',
+            path: '/',
+            handler: (request, h) => {
+                return 'Hello World!';
+            }
         }
-    });
+    ]);
 
     await server.start();
     console.log('Server running on %s', server.info.uri);
