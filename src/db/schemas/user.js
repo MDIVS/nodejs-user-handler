@@ -40,15 +40,12 @@ function init(connection) {
             last_ip: {type: Sequelize.STRING},
             keep_connected: {type: Sequelize.BOOLEAN},
             last_accepted_term_version: {type: Sequelize.STRING},
-            created_at: {type: Sequelize.DATE, defaultValue: Sequelize.NOW},
-            updated_at: {type: Sequelize.DATE, defaultValue: Sequelize.NOW}
         },
         {
             sequelize: connection,
             modelName: 'User',
             tableName: 'users',
-            freezeTableName: false,
-            timestamps: false
+            freezeTableName: false
         },
     );
 };
