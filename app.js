@@ -5,6 +5,7 @@ const Postgres = require('./src/db/postgres');
 const init_schema_user = require('./src/db/schemas/user');
 
 const Hapi = require('@hapi/hapi');
+const RouteUser = require('./src/routes/user');
 
 async function main() {
     let connection = await Postgres.connect();
@@ -15,32 +16,19 @@ async function main() {
         port: process.env.PORT,
         host: 'localhost'
     });
-    
-    server.route([
-        {
-            method: 'POST',
-            path: '/user',
-            options: {
-                description: 'Creates user in database',
-                handler: async (request) => {
-                    const { record } = request.payload;
-                    let new_record = await connection.models.User.create(record);
-                    
-                    return {
-                        message: 'Record successfully commited to database.',
-                        record: new_record
-                    };
+
+    server.route(
+        [
+            {
+                method: 'GET',
+                path: '/',
+                handler: (request, h) => {
+                    return 'Hello World!';
                 }
-            }
-        },
-        {
-            method: 'GET',
-            path: '/',
-            handler: (request, h) => {
-                return 'Hello World!';
-            }
-        }
-    ]);
+            },
+            ...new RouteUser(connection).routes
+        ]
+    );
 
     await server.start();
     console.log('Server running on %s', server.info.uri);
