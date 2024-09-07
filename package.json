@@ -19,6 +19,10 @@
   "homepage": "https://github.com/MDIVS/node-js-user-handler#readme",
   "dependencies": {
     "@hapi/hapi": "^21.3.10",
+    "@hapi/inert": "^7.1.0",
+    "@hapi/vision": "^7.0.3",
+    "hapi-swagger": "^17.2.1",
+    "joi": "^17.13.3",
     "pg": "^8.12.0",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.3"
