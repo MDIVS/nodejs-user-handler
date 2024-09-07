@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const { Sequelize, Op } = require('sequelize');
 
 class UserRoutes {
     /**
@@ -33,16 +34,29 @@ class UserRoutes {
                 },
             },
             handler: async (request) => {
-                const { record } = request.payload;
-                let new_record = await this.db.models.User.create(record);
-                
-                return {
-                    message: 'Record successfully commited to database.',
-                    record: new_record
-                };
+                try {
+                    const { record } = request.payload;
+
+                    let user = await this.db.models.User.findOne({
+                        where: {[Op.or]:[{username:record.username}, {email:record.email}]}
+                    });
+
+                    if (user) {
+                        if (user.username == record.username) return {message: 'Username already taken'};
+                        if (user.email == record.email) return {message: 'Email already taken'};
+                        return {message: 'Unknown error'};
+                    }
+
+                    let new_record = await this.db.models.User.create(record);
+
+                    return {
+                        message: 'Record successfully commited to database.',
+                        record: new_record
+                    }
+                } catch(error) {console.log(error)}
             }
         }
     ];
 }
 
-module.exports = UserRoutes
+module.exports = UserRoutes;
