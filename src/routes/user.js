@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const Boom = require('boom');
 const { Sequelize, Op } = require('sequelize');
 
 class UserRoutes {
@@ -42,9 +43,9 @@ class UserRoutes {
                     });
 
                     if (user) {
-                        if (user.username == record.username) return {message: 'Username already taken'};
-                        if (user.email == record.email) return {message: 'Email already taken'};
-                        return {message: 'Unknown error'};
+                        if (user.username == record.username) return Boom.conflict('Username already taken');
+                        if (user.email == record.email) return Boom.conflict('Email already taken');
+                        return Boom.internal('Unknown error while searching for user conflicts');
                     }
 
                     let new_record = await this.db.models.User.create(record);
