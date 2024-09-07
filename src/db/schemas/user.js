@@ -13,38 +13,16 @@ function init(connection) {
                 type: Sequelize.INTEGER,
                 required: true,
                 primaryKey: true,
-                autoIncrement: true,
-                unique: true,
-                deferrable: Sequelize.Deferrable.SET_DEFERRED // Prevents updates from conflicting with themselves by postponing the duplication check until the end of the operation.
+                autoIncrement: true
             },
-    
-            preferredname: {type: Sequelize.STRING},
-            firstname: {type: Sequelize.STRING, required: true},
-            middlename: {type: Sequelize.STRING},
-            lastname: {type: Sequelize.STRING, required: true},
-            fullname: {type: Sequelize.STRING, required: true},
-            username: {type: Sequelize.STRING, unique: true},
-    
-            // profile_id: {type: Sequelize.INTEGER, references: {model:'profiles', key:'id'}},
-            // role_id: {type: Sequelize.INTEGER, references: {model:'roles', key:'id'}},
-            email: {
-                type: Sequelize.STRING,
-                required: true,
-                unique: true,
-                deferrable: Sequelize.Deferrable.SET_DEFERRED
-            },
-            
-            password: {type: Sequelize.STRING, required: true},
-            phone: {type: Sequelize.STRING},
-            last_ip: {type: Sequelize.STRING},
-            keep_connected: {type: Sequelize.BOOLEAN},
-            last_accepted_term_version: {type: Sequelize.STRING},
+
+            username: {type: Sequelize.STRING, unique: true, required: true},
+            password: {type: Sequelize.STRING, required: true}
         },
         {
             sequelize: connection,
             modelName: 'User',
-            tableName: 'users',
-            freezeTableName: false
+            tableName: 'users'
         },
     );
 };

@@ -21,14 +21,6 @@ class UserRoutes {
                     payload: Joi.object({
                         record: {
                             username:                   Joi.string().min(5).max(100).required(),
-                            firstname:                  Joi.string().min(3).max(100).required(),
-                            middlename:                 Joi.string().min(3).max(100),
-                            lastname:                   Joi.string().min(3).max(100).required(),
-                            fullname:                   Joi.string().min(3).max(255).required(),
-                            preferredname:              Joi.string().min(3).max(32),
-
-                            email:                      Joi.string().email({minDomainSegments: 1}).required(),
-                            phone:                      Joi.string().min(8).max(13).allow(null,''),
                             password:                   Joi.string().optional().min(8).max(16).required()
                         }
                     })
@@ -38,22 +30,16 @@ class UserRoutes {
                 try {
                     const { record } = request.payload;
 
-                    let user = await this.db.models.User.findOne({
-                        where: {[Op.or]:[{username:record.username}, {email:record.email}]}
-                    });
+                    let user = await this.db.models.User.findOne({where: {[Op.or]:[{username:record.username}]}});
 
                     if (user) {
                         if (user.username == record.username) return Boom.conflict('Username already taken');
-                        if (user.email == record.email) return Boom.conflict('Email already taken');
                         return Boom.internal('Unknown error while searching for user conflicts');
                     }
 
-                    let new_record = await this.db.models.User.create(record);
+                    await this.db.models.User.create(record);
 
-                    return {
-                        message: 'Record successfully commited to database.',
-                        record: new_record
-                    }
+                    return {message: 'User registered successfully.'}
                 } catch(error) {console.log(error)}
             }
         }
