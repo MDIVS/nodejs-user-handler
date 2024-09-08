@@ -17,7 +17,8 @@ async function main() {
 
     const server = Hapi.server({
         port: process.env.PORT,
-        host: 'localhost'
+        host: 'localhost',
+        routes: {cors: true}
     });
 
     server.route(
