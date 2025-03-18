@@ -3,6 +3,7 @@ console.log(`Node Js User Handler (${process.env.ENV_NAME})`);
 
 const Postgres = require('./src/db/postgres');
 const init_schema_user = require('./src/db/schemas/user');
+const init_schema_user_auth_provider = require('./src/db/schemas/user-auth-provider');
 
 const Hapi = require('@hapi/hapi');
 const RouteUser = require('./src/routes/user');
@@ -10,6 +11,7 @@ const RouteUser = require('./src/routes/user');
 async function main() {
     let connection = await Postgres.connect();
     init_schema_user(connection);
+    init_schema_user_auth_provider(connection);
     connection.sync();
 
     const server = Hapi.server({

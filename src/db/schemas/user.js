@@ -19,21 +19,15 @@ function init(connection) {
             },
     
             preferredname: {type: Sequelize.STRING},
-            firstname: {type: Sequelize.STRING, required: true},
+            firstname: {type: Sequelize.STRING},
             middlename: {type: Sequelize.STRING},
-            lastname: {type: Sequelize.STRING, required: true},
-            fullname: {type: Sequelize.STRING, required: true},
-            username: {type: Sequelize.STRING, primaryKey: true},
+            lastname: {type: Sequelize.STRING},
+            fullname: {type: Sequelize.STRING},
+            username: {type: Sequelize.STRING, required: true, unique: true, deferrable: Sequelize.Deferrable.SET_DEFERRED},
     
             // profile_id: {type: Sequelize.INTEGER, references: {model:'profiles', key:'id'}},
             // role_id: {type: Sequelize.INTEGER, references: {model:'roles', key:'id'}},
-            email: {
-                type: Sequelize.STRING,
-                required: true,
-                primaryKey: true,
-                unique: true,
-                deferrable: Sequelize.Deferrable.SET_DEFERRED
-            },
+            email: {type: Sequelize.STRING, unique: true, deferrable: Sequelize.Deferrable.SET_DEFERRED},
             
             password: {type: Sequelize.STRING, required: true},
             phone: {type: Sequelize.STRING},
