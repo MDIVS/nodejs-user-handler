@@ -33,7 +33,7 @@ class Postgres {
 
         try {
             await connection.authenticate();
-            console.log('Postgres database connection has been established successfully.');
+            console.log('✅ Postgres database connection has been established successfully.');
         } catch (error) {
             throw Error(`Unable to connect to the database: ${error}`);
         }

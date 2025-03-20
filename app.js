@@ -1,5 +1,5 @@
 if (!process.env.ENV_NAME) throw new Error('No enviroment detected, check if you are running the application using "npm run" command.');
-console.log(`Node Js User Handler (${process.env.ENV_NAME})`);
+console.log(`⭐ Node Js User Handler (${process.env.ENV_NAME})`);
 
 const Postgres = require('./src/db/postgres');
 const init_schema_user = require('./src/db/schemas/user');
@@ -56,7 +56,7 @@ async function main() {
     );
 
     await server.start();
-    console.log('Server running on %s', server.info.uri);
+    console.log('🎯 Server running on %s', server.info.uri);
 };
 
 process.on('unhandledRejection', (err) => {
