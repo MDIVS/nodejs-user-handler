@@ -11,6 +11,7 @@ class UserRoutes {
             path: '/user',
             method: 'POST',
             options: {
+                tags: ['api'],
                 description: 'Creates user in database',
                 handler: async (request) => {
                     const { record } = request.payload;

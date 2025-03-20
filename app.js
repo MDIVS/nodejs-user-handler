@@ -6,6 +6,11 @@ const init_schema_user = require('./src/db/schemas/user');
 const init_schema_user_auth_provider = require('./src/db/schemas/user-auth-provider');
 
 const Hapi = require('@hapi/hapi');
+const Inert = require('@hapi/inert');
+const Vision = require('@hapi/vision');
+const HapiSwagger = require('hapi-swagger');
+const Pack = require('./package');
+
 const RouteUser = require('./src/routes/user');
 
 async function main() {
@@ -18,12 +23,30 @@ async function main() {
         port: process.env.PORT,
         host: 'localhost'
     });
-
+      
+    await server.register([
+        Inert,
+        Vision,
+        {
+            plugin: HapiSwagger,
+            options: {
+                info: {
+                    title: 'API Documentation',
+                    version: Pack.version,
+                },
+                documentationPath: '/'
+            }
+        }
+    ]);
+        
     server.route(
         [
             {
                 method: 'GET',
-                path: '/',
+                path: '/test',
+                options: {
+                    tags: ['api']
+                },
                 handler: (request, h) => {
                     return 'Hello World!';
                 }

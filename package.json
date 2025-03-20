@@ -18,8 +18,11 @@
   },
   "homepage": "https://github.com/MDIVS/node-js-user-handler#readme",
   "dependencies": {
-    "@hapi/hapi": "^21.3.10",
+    "@hapi/hapi": "^21.4.0",
+    "@hapi/inert": "^7.1.0",
+    "@hapi/vision": "^7.0.3",
     "google-auth-library": "^9.15.1",
+    "hapi-swagger": "^17.3.2",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.12.0",
     "pg-hstore": "^2.3.4",
