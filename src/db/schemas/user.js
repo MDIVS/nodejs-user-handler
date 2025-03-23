@@ -34,12 +34,17 @@ function init(connection) {
             last_ip: {type: Sequelize.STRING},
             keep_connected: {type: Sequelize.BOOLEAN},
             last_accepted_term_version: {type: Sequelize.STRING},
+            created_at: { type: Sequelize.DATE, allowNull: false },
+            updated_at: { type: Sequelize.DATE, allowNull: false },
         },
         {
             sequelize: connection,
             modelName: 'User',
             tableName: 'users',
-            freezeTableName: false
+            freezeTableName: false,
+            timestamps: true,
+            createdAt: 'created_at',
+            updatedAt: 'updated_at',
         },
     );
 };

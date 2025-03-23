@@ -29,13 +29,18 @@ function init(connection) {
             provider_user_id: {
                 type: Sequelize.STRING,
                 allowNull: false,
-            }
+            },
+            created_at: { type: Sequelize.DATE, allowNull: false },
+            updated_at: { type: Sequelize.DATE, allowNull: false },
         },
         {
             sequelize: connection,
             modelName: 'UserAuthProvider',
             tableName: 'user_auth_providers',
-            freezeTableName: false
+            freezeTableName: false,
+            timestamps: true,
+            createdAt: 'created_at',
+            updatedAt: 'updated_at',
         },
     );
 };
