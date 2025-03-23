@@ -29,12 +29,6 @@ function init(connection) {
             provider_user_id: {
                 type: Sequelize.STRING,
                 allowNull: false,
-            },
-            issued_at: {
-                type: Sequelize.DATE
-            },
-            expires_at: {
-                type: Sequelize.DATE
             }
         },
         {
