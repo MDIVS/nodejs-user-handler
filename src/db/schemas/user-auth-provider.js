@@ -11,7 +11,7 @@ function init(connection) {
         {
             id: {
                 type: Sequelize.INTEGER,
-                required: true,
+                allowNull: false,
                 primaryKey: true,
                 autoIncrement: true,
                 unique: true,
@@ -20,15 +20,15 @@ function init(connection) {
             user_id: {
                 type: Sequelize.INTEGER,
                 foreignKey: true,
-                required: true
+                allowNull: false,
             },
             provider: {
                 type: Sequelize.STRING,
-                required: true,
+                allowNull: false,
             },
             provider_user_id: {
                 type: Sequelize.STRING,
-                required: true,
+                allowNull: false,
             },
             issued_at: {
                 type: Sequelize.DATE

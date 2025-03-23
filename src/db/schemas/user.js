@@ -11,7 +11,7 @@ function init(connection) {
         {
             id: {
                 type: Sequelize.INTEGER,
-                required: true,
+                allowNull: false,
                 primaryKey: true,
                 autoIncrement: true,
                 unique: true,
@@ -23,13 +23,13 @@ function init(connection) {
             middlename: {type: Sequelize.STRING},
             lastname: {type: Sequelize.STRING},
             fullname: {type: Sequelize.STRING},
-            username: {type: Sequelize.STRING, required: true, unique: true, deferrable: Sequelize.Deferrable.SET_DEFERRED},
+            username: {type: Sequelize.STRING, allowNull: false, unique: true, deferrable: Sequelize.Deferrable.SET_DEFERRED},
     
             // profile_id: {type: Sequelize.INTEGER, references: {model:'profiles', key:'id'}},
             // role_id: {type: Sequelize.INTEGER, references: {model:'roles', key:'id'}},
             email: {type: Sequelize.STRING, unique: true, deferrable: Sequelize.Deferrable.SET_DEFERRED},
             
-            password: {type: Sequelize.STRING, required: true},
+            password: {type: Sequelize.STRING, allowNull: false},
             phone: {type: Sequelize.STRING},
             last_ip: {type: Sequelize.STRING},
             keep_connected: {type: Sequelize.BOOLEAN},
