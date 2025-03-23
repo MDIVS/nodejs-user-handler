@@ -23,6 +23,7 @@
     "@hapi/vision": "^7.0.3",
     "google-auth-library": "^9.15.1",
     "hapi-swagger": "^17.3.2",
+    "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.12.0",
     "pg-hstore": "^2.3.4",

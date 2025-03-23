@@ -28,12 +28,15 @@ function init(connection) {
             // profile_id: {type: Sequelize.INTEGER, references: {model:'profiles', key:'id'}},
             // role_id: {type: Sequelize.INTEGER, references: {model:'roles', key:'id'}},
             email: {type: Sequelize.STRING, unique: true, deferrable: Sequelize.Deferrable.SET_DEFERRED},
+
+            profile_picture_external_url: {type: Sequelize.STRING},
             
-            password: {type: Sequelize.STRING, allowNull: false},
+            password: {type: Sequelize.STRING},
             phone: {type: Sequelize.STRING},
             last_ip: {type: Sequelize.STRING},
             keep_connected: {type: Sequelize.BOOLEAN},
             last_accepted_term_version: {type: Sequelize.STRING},
+            active: {type: Sequelize.BOOLEAN, defaultValue: true},
             created_at: { type: Sequelize.DATE, allowNull: false },
             updated_at: { type: Sequelize.DATE, allowNull: false },
         },

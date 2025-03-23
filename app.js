@@ -12,6 +12,7 @@ const HapiSwagger = require('hapi-swagger');
 const Pack = require('./package');
 
 const RouteUser = require('./src/routes/user');
+const AuthRoutes = require('./src/routes/auth');
 
 async function main() {
     let connection = await Postgres.connect();
@@ -52,10 +53,11 @@ async function main() {
                     return 'Hello World!';
                 }
             },
-            ...new RouteUser(connection).routes
+            ...new RouteUser(connection).routes,
+            ...new AuthRoutes(connection).routes
         ]
     );
-
+    
     await server.start();
     console.log('🎯 Server running on %s', server.info.uri);
 };
