@@ -1,4 +1,4 @@
-const { Sequelize, Model } = require('sequelize');
+import { Sequelize, Model } from 'sequelize';
 
 class UserAuthProviders extends Model {}
 
@@ -45,4 +45,4 @@ function init(connection) {
     );
 };
 
-module.exports = init;
+export default init;

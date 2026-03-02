@@ -1,4 +1,4 @@
-const { Sequelize, Model } = require('sequelize');
+import { Sequelize, Model } from 'sequelize';
 
 class User extends Model {}
 
@@ -52,4 +52,4 @@ function init(connection) {
     );
 };
 
-module.exports = init;
+export default init;

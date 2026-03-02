@@ -1,4 +1,4 @@
-const Sequelize = require('sequelize');
+import Sequelize from 'sequelize';
 
 const SSL_DB = process.env.SSL_DB === 'true' ? true : undefined;
 const SSL_DB_REJECT = process.env.SSL_DB_REJECT === 'false' ? false : undefined;
@@ -23,4 +23,4 @@ const sequelize = new Sequelize(
     }
 );
 
-module.exports = sequelize;
+export default sequelize;

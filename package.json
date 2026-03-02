@@ -1,6 +1,7 @@
 {
   "name": "nodejs-user-handler",
   "version": "1.0.0",
+  "type": "module",
   "description": "Open source backend for handling user sign in and sign out with node js and postgres",
   "main": "app.js",
   "scripts": {

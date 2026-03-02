@@ -27,4 +27,4 @@ class UserRoutes {
     ];
 }
 
-module.exports = UserRoutes
+export default UserRoutes;

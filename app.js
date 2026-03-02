@@ -1,18 +1,18 @@
 if (!process.env.ENV_NAME) throw new Error('No enviroment detected, check if you are running the application using "npm run" command.');
 console.log(`⭐ Node Js User Handler (${process.env.ENV_NAME})`);
 
-const sequelize = require('./src/db/sequelize');
-const init_schema_user = require('./src/db/schemas/user');
-const init_schema_user_auth_provider = require('./src/db/schemas/user-auth-provider');
+import sequelize from './src/db/sequelize.js';
+import init_schema_user from './src/db/schemas/user.js';
+import init_schema_user_auth_provider from './src/db/schemas/user-auth-provider.js';
 
-const Hapi = require('@hapi/hapi');
-const Inert = require('@hapi/inert');
-const Vision = require('@hapi/vision');
-const HapiSwagger = require('hapi-swagger');
-const Pack = require('./package');
+import Hapi from '@hapi/hapi';
+import Inert from '@hapi/inert';
+import Vision from '@hapi/vision';
+import HapiSwagger from 'hapi-swagger';
+import Pack from './package.json' with { type: 'json' };
 
-const RouteUser = require('./src/routes/user');
-const AuthRoutes = require('./src/routes/auth');
+import RouteUser from './src/routes/user.js';
+import AuthRoutes from './src/routes/auth.js';
 
 async function main() {
     try {
@@ -73,4 +73,4 @@ process.on('unhandledRejection', (err) => {
     process.exit(1);
 });
 
-module.exports = main();
+export default main();

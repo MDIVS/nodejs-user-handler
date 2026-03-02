@@ -1,6 +1,6 @@
-const { OAuth2Client } = require('google-auth-library');
-const Joi = require('joi');
-const jwt = require('jsonwebtoken');
+import { OAuth2Client } from 'google-auth-library';
+import Joi from 'joi';
+import jwt from 'jsonwebtoken';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -106,4 +106,4 @@ class AuthRoutes {
     ];
 }
 
-module.exports = AuthRoutes
+export default AuthRoutes;
