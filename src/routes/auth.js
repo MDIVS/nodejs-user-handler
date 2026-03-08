@@ -10,6 +10,54 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export default [
     {
+        path: '/auth/login',
+        method: 'POST',
+        options: {
+            tags: ['api'],
+            description: 'Login using username and password',
+            validate: {
+                payload: Joi.object({
+                    username: Joi.string().max(255).required().example('johnsmith'),
+                    password: Joi.string().max(255).required().example('Jhon@1984')
+                }).required()
+            },
+            handler: async (request, h) => {
+                try {
+                    const { username, password } = request.payload;
+
+                    const user = await User.findOne({ where: { username } });
+
+                    if (!user) { return Boom.unauthorized('Invalid user.'); }
+                    if (!user.active) { return Boom.unauthorized('Deactivated user.'); }
+                    if (user.password !== password) { return Boom.unauthorized('Invalid credentials.'); }
+
+                    const jwtToken = jwt.sign(
+                        { id: user.id, email: user.email },
+                        process.env.JWT_SECRET,
+                        { expiresIn: '1h' }
+                    );
+
+                    return h.response({
+                        user: {
+                            id: user.id,
+                            preferredname: user.preferredname,
+                            fullname: user.fullname,
+                            username: user.username,
+                            email: user.email,
+                            profile_picture_external_url: user.profile_picture_external_url
+                        }
+                    })
+                        .state('session', jwtToken);
+                } catch (error) {
+                    mapSequelizeError(error);
+
+                    console.error('Error in /auth/login route:', error);
+                    throw Boom.internal();
+                }
+            }
+        }
+    },
+    {
         path: '/auth/sso',
         method: 'POST',
         options: {
@@ -70,7 +118,7 @@ export default [
                     }
 
                     const jwtToken = jwt.sign(
-                        { userId: user.id },
+                        { id: user.id, email: user.email },
                         process.env.JWT_SECRET,
                         { expiresIn: '1h' }
                     );
