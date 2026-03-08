@@ -1,7 +1,6 @@
 if (!process.env.ENV_NAME) throw new Error('No enviroment detected, check if you are running the application using "npm run" command.');
 console.log(`⭐ Node Js User Handler (${process.env.ENV_NAME})`);
 
-import sequelize from './src/db/sequelize.js';
 import './src/db/initializer.js';
 
 import Hapi from '@hapi/hapi';
@@ -11,7 +10,7 @@ import HapiSwagger from 'hapi-swagger';
 import Pack from './package.json' with { type: 'json' };
 
 import RouteUser from './src/routes/user.js';
-import AuthRoutes from './src/routes/auth.js';
+import RouteAuth from './src/routes/auth.js';
 
 async function main() {
     const server = Hapi.server({
@@ -35,6 +34,13 @@ async function main() {
         }
     ]);
 
+    server.state('session', {
+        ttl: 3600000,
+        isSecure: true,
+        isHttpOnly: true,
+        isSameSite: 'Lax'
+    });
+
     server.route(
         [
             {
@@ -47,8 +53,8 @@ async function main() {
                     return 'Hello World!';
                 }
             },
-            ...new RouteUser(sequelize).routes,
-            ...new AuthRoutes(sequelize).routes
+            ...RouteUser,
+            ...RouteAuth
         ]
     );
 
