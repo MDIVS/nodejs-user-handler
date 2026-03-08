@@ -9,8 +9,7 @@ import Vision from '@hapi/vision';
 import HapiSwagger from 'hapi-swagger';
 import Pack from './package.json' with { type: 'json' };
 
-import RouteUser from './src/routes/user.js';
-import RouteAuth from './src/routes/auth.js';
+import routes from './src/routes/index.js';
 
 async function main() {
     const server = Hapi.server({
@@ -43,6 +42,7 @@ async function main() {
 
     server.route(
         [
+            ...routes,
             {
                 method: 'GET',
                 path: '/test',
@@ -52,9 +52,7 @@ async function main() {
                 handler: (request, h) => {
                     return 'Hello World!';
                 }
-            },
-            ...RouteUser,
-            ...RouteAuth
+            }
         ]
     );
 
