@@ -2,8 +2,8 @@ if (!process.env.ENV_NAME) throw new Error('No enviroment detected, check if you
 console.log(`⭐ Node Js User Handler (${process.env.ENV_NAME})`);
 
 import sequelize from './src/db/sequelize.js';
-import init_schema_user from './src/db/schemas/user.js';
-import init_schema_user_auth_provider from './src/db/schemas/user-auth-provider.js';
+import init_schema_user from './src/models/user.js';
+import init_schema_user_auth_provider from './src/models/user-auth-provider.js';
 
 import Hapi from '@hapi/hapi';
 import Inert from '@hapi/inert';
