@@ -53,10 +53,7 @@ export default [
                         attributes: ['id', 'preferredname', 'fullname', 'username', 'email', 'phone', 'active', 'created_at', 'updated_at']
                     });
                     
-                    return {
-                        message: 'Users retrieved successfully.',
-                        users: users
-                    };
+                    return { users };
                 } catch(error) {
                     console.log('Error in GET /users route:', error);
                     throw Boom.internal();
