@@ -63,5 +63,34 @@ export default [
                 }
             }
         }
+    },
+    {
+        path: '/user',
+        method: 'GET',
+        options: {
+            tags: ['api'],
+            description: 'Get a user by username',
+            validate: {
+                query: Joi.object({
+                    username: Joi.string().required().example('johnsmith')
+                }).required()
+            },
+            handler: async (request) => {
+                try {
+                    const user = await User.findOne({
+                        where: { username: request.query.username },
+                        attributes: ['preferredname', 'username', 'active', 'created_at']
+                    });
+                    
+                    if (!user) { throw Boom.notFound('User not found'); }
+                    
+                    return { user };
+                } catch(error) {
+                    if (error.isBoom) { throw error; }
+                    console.log('Error in GET /user route:', error);
+                    throw Boom.internal();
+                }
+            }
+        }
     }
 ];
