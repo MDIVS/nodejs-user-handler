@@ -15,7 +15,15 @@ async function main() {
     const server = Hapi.server({
         port: process.env.PORT,
         host: 'localhost',
-        routes: { cors: { origin: ["*"] } }
+        routes: {
+            cors: {
+                origin: [
+                    'http://localhost:'+process.env.PORT,
+                    process.env.FRONTEND_ORIGIN
+                ],
+                credentials: true
+            }
+        }
     });
 
     await server.register([
