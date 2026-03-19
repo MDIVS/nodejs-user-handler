@@ -28,8 +28,8 @@ Once the containers are ready, the postgres server can be accessed by
     |-------------|-------------|
     | System      | PostgreSQL  |
     | Server      | postgres    |
-    | Username    | mdivs       |
-    | Password    | 81655127    |
-    | Database    | ejc_aa      |
+    | Username    | admin       |
+    | Password    | 12345678    |
+    | Database    | main        |
 
 ![fullfilled form example](postgre_access_form.png)
