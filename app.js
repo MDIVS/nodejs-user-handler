@@ -22,6 +22,13 @@ async function main() {
                     process.env.FRONTEND_ORIGIN
                 ],
                 credentials: true
+            },
+            state: {
+                //  This will disable Hapi default cookie parser but cookies still available to be manually parsed by:
+                //  import cookie from 'cookie';
+                //  const cookies = cookie.parse(request.headers.cookie || '');
+                //  const session = cookies.session;
+                parse: false
             }
         }
     });
@@ -40,29 +47,9 @@ async function main() {
             }
         }
     ]);
-
-    server.state('session', {
-        ttl: 3600000,
-        isSecure: true,
-        isHttpOnly: true,
-        isSameSite: 'Lax'
-    });
-
-    server.route(
-        [
-            ...routes,
-            {
-                method: 'GET',
-                path: '/test',
-                options: {
-                    tags: ['api']
-                },
-                handler: (request, h) => {
-                    return 'Hello World!';
-                }
-            }
-        ]
-    );
+    
+    server.state('session', { isSameSite: 'Lax' });
+    server.route(routes);
 
     await server.start();
     console.log('🎯 Server running on %s', server.info.uri);
