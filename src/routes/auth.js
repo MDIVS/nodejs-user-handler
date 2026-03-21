@@ -5,6 +5,7 @@ import UserAuthProvider from '../models/user-auth-provider.js';
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
 import mapSequelizeError from '../utils/map-sequelize-error.js';
+import cookie from 'cookie';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -51,7 +52,7 @@ export default [
                 } catch (error) {
                     mapSequelizeError(error);
 
-                    console.error('Error in /auth/login route:', error);
+                    console.error('Error in POST /auth/login route:', error);
                     throw Boom.internal();
                 }
             }
@@ -72,18 +73,13 @@ export default [
                 try {
                     const { token } = request.payload;
 
-                    let google_response;
+                    const ticket = await client.verifyIdToken({
+                        idToken: token,
+                        audience: process.env.GOOGLE_CLIENT_ID,
+                    });
 
-                    try {
-                        const ticket = await client.verifyIdToken({
-                            idToken: token,
-                            audience: process.env.GOOGLE_CLIENT_ID,
-                        });
-                        google_response = ticket.getPayload();
-                    } catch(error) {
-                        return Boom.unauthorized( 'The provided token is invalid.' );
-                    };
-
+                    let google_response = ticket.getPayload();
+                    
                     if (!google_response.email_verified) console.warn('SSO login with an unverified user email:', google_response);
 
                     let user = await User.findOne({where: {email: google_response.email}});
@@ -97,7 +93,14 @@ export default [
                         });
 
                         if (authRecord && authRecord.provider_user_id !== google_response.sub) {
+                            user.active = false;
+                            await user.save();
                             return Boom.unauthorized( 'User already exists with same email but a different Google Id (sub). We are blocking the access for security reasons. Please contact us if you think it is a mistake.' );
+                        }
+
+                        if (user.profile_picture_external_url != google_response.picture) {
+                            user.profile_picture_external_url = google_response.picture;
+                            await user.save();
                         }
                     } else {
                         user = await User.create({
@@ -113,7 +116,6 @@ export default [
                             user_id: user.id,
                             provider: google_response.iss,
                             provider_user_id: google_response.sub,
-                            accessToken: token
                         });
                     }
 
@@ -140,9 +142,62 @@ export default [
                 } catch (error) {
                     mapSequelizeError(error);
 
-                    console.error('Error in /auth/sso route:', error);
+                    console.error('Error in POST /auth/sso route:', error);
                     throw Boom.internal();
                 }
+            }
+        }
+    },
+    {
+        path: '/auth/me',
+        method: 'GET',
+        options: {
+            tags: ['api'],
+            description: 'Get current session user',
+            handler: async (request, h) => {
+                try {
+                    const cookies = cookie.parse(request.headers.cookie || '');
+                    const session = cookies.session;
+
+                    if (!session) { return Boom.unauthorized('No session.'); }
+
+                    let decoded;
+                    try { decoded = jwt.verify(session, process.env.JWT_SECRET); }
+                    catch (err) { return Boom.unauthorized('Invalid session.'); }
+
+                    const user = await User.findOne({ where: { id: decoded.id } });
+
+                    if (!user) { return Boom.unauthorized('User not found.'); }
+                    if (!user.active) { return Boom.unauthorized('Deactivated user.'); }
+
+                    return {
+                        user: {
+                            id: user.id,
+                            preferredname: user.preferredname,
+                            fullname: user.fullname,
+                            username: user.username,
+                            email: user.email,
+                            profile_picture_external_url: user.profile_picture_external_url
+                        },
+                        permissions: []
+                    };
+                } catch (error) {
+                    mapSequelizeError(error);
+
+                    console.error('Error in GET /auth/me route:', error);
+                    throw Boom.internal();
+                }
+            }
+        }
+    },
+    {
+        path: '/auth/logout',
+        method: 'POST',
+        options: {
+            tags: ['api'],
+            description: 'Logout user',
+            handler: async (request, h) => {
+                return h.response({}).unstate('session');
             }
         }
     }

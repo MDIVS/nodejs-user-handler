@@ -23,13 +23,7 @@ async function main() {
                 ],
                 credentials: true
             },
-            state: {
-                //  This will disable Hapi default cookie parser but cookies still available to be manually parsed by:
-                //  import cookie from 'cookie';
-                //  const cookies = cookie.parse(request.headers.cookie || '');
-                //  const session = cookies.session;
-                parse: false
-            }
+            state: { parse: false }
         }
     });
 
