@@ -10,6 +10,38 @@ import cookie from 'cookie';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+const permissionsInclude = {
+    model: Permission,
+    as: 'permissions',
+    attributes: ['name', 'description'],
+    through: { attributes: [] }
+};
+
+const generateSessionToken = (user) => jwt.sign(
+    { id: user.id, email: user.email },
+    process.env.JWT_SECRET,
+    { expiresIn: '1h' }
+);
+
+const buildUserPayload = (user) => ({
+    id: user.id,
+    preferredname: user.preferredname,
+    firstname: user.firstname,
+    middlename: user.middlename,
+    lastname: user.lastname,
+    fullname: user.fullname,
+    username: user.username,
+    email: user.email,
+    profile_picture_external_url: user.profile_picture_external_url
+});
+
+const buildPermissionsPayload = (user) => (user.permissions || []).map(({ name, description }) => ({ name, description }));
+
+const buildAuthResponsePayload = (user) => ({
+    user: buildUserPayload(user),
+    permissions: buildPermissionsPayload(user)
+});
+
 export default [
     {
         path: '/auth/login',
@@ -27,28 +59,15 @@ export default [
                 try {
                     const { username, password } = request.payload;
 
-                    const user = await User.findOne({ where: { username } });
+                    const user = await User.findOne({ where: { username }, include: [permissionsInclude] });
 
                     if (!user) { return Boom.unauthorized('Invalid user.'); }
                     if (!user.active) { return Boom.unauthorized('Deactivated user.'); }
                     if (user.password !== password) { return Boom.unauthorized('Invalid credentials.'); }
 
-                    const jwtToken = jwt.sign(
-                        { id: user.id, email: user.email },
-                        process.env.JWT_SECRET,
-                        { expiresIn: '1h' }
-                    );
+                    const jwtToken = generateSessionToken(user);
 
-                    return h.response({
-                        user: {
-                            id: user.id,
-                            preferredname: user.preferredname,
-                            fullname: user.fullname,
-                            username: user.username,
-                            email: user.email,
-                            profile_picture_external_url: user.profile_picture_external_url
-                        }
-                    })
+                    return h.response(buildAuthResponsePayload(user))
                         .state('session', jwtToken);
                 } catch (error) {
                     mapSequelizeError(error);
@@ -80,10 +99,10 @@ export default [
                     });
 
                     let google_response = ticket.getPayload();
-                    
+
                     if (!google_response.email_verified) console.warn('SSO login with an unverified user email:', google_response);
 
-                    let user = await User.findOne({where: {email: google_response.email}});
+                    let user = await User.findOne({ where: { email: google_response.email }, include: [permissionsInclude] });
                     let authRecord;
 
                     if (user) {
@@ -110,6 +129,7 @@ export default [
                             username: google_response.email,
                             profile_picture_external_url: google_response.picture
                         });
+                        await user.reload({ include: [permissionsInclude] });
                     }
 
                     if (!authRecord) {
@@ -120,26 +140,10 @@ export default [
                         });
                     }
 
-                    const jwtToken = jwt.sign(
-                        { id: user.id, email: user.email },
-                        process.env.JWT_SECRET,
-                        { expiresIn: '1h' }
-                    );
+                    const jwtToken = generateSessionToken(user);
 
-                    return h.response({
-                        user: {
-                            id: user.id,
-                            preferredname: user.preferredname,
-                            firstname: user.firstname,
-                            middlename: user.middlename,
-                            lastname: user.lastname,
-                            fullname: user.fullname,
-                            username: user.username,
-                            email: user.email,
-                            profile_picture_external_url: user.profile_picture_external_url
-                        }
-                    })
-                    .state('session', jwtToken);
+                    return h.response(buildAuthResponsePayload(user))
+                        .state('session', jwtToken);
                 } catch (error) {
                     mapSequelizeError(error);
 
@@ -166,25 +170,12 @@ export default [
                     try { decoded = jwt.verify(session, process.env.JWT_SECRET); }
                     catch (err) { return Boom.unauthorized('Invalid session.'); }
 
-                    const user = await User.findOne({
-                        where: { id: decoded.id },
-                        include: [{ model: Permission, as: 'permissions', attributes: ['name', 'description'], through: { attributes: [] } }]
-                    });
+                    const user = await User.findOne({ where: { id: decoded.id }, include: [permissionsInclude] });
 
-                    if (!user) { return Boom.unauthorized('User not found.'); }
+                    if (!user) { return Boom.unauthorized('Invalid user.'); }
                     if (!user.active) { return Boom.unauthorized('Deactivated user.'); }
 
-                    return {
-                        user: {
-                            id: user.id,
-                            preferredname: user.preferredname,
-                            fullname: user.fullname,
-                            username: user.username,
-                            email: user.email,
-                            profile_picture_external_url: user.profile_picture_external_url
-                        },
-                        permissions: user.permissions.map(({ name, description }) => ({ name, description }))
-                    };
+                    return buildAuthResponsePayload(user);
                 } catch (error) {
                     mapSequelizeError(error);
 
