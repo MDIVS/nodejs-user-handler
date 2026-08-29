@@ -42,7 +42,7 @@ async function main() {
         }
     ]);
     
-    server.state('session', { isSameSite: 'Lax' });
+    server.state('session', { isSameSite: 'Lax', path: '/' });
     server.route(routes);
 
     await server.start();

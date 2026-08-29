@@ -23,6 +23,16 @@ Permission.init(
             type: Sequelize.STRING,
             allowNull: true,
         },
+        parent_id: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+            references: {
+                model: 'permissions',
+                key: 'id',
+            },
+            onDelete: 'SET NULL',
+            onUpdate: 'CASCADE',
+        },
         active: {
             type: Sequelize.BOOLEAN,
             defaultValue: true,

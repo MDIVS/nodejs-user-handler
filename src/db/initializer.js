@@ -26,6 +26,9 @@ Permission.hasMany(PermissionAssignment, { foreignKey: 'permission_id', as: 'per
 PermissionAssignment.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 PermissionAssignment.belongsTo(Permission, { foreignKey: 'permission_id', as: 'permission' });
 
+Permission.belongsTo(Permission, { foreignKey: 'parent_id', as: 'parent' });
+Permission.hasMany(Permission, { foreignKey: 'parent_id', as: 'children' });
+
 try {
     await sequelize.authenticate();
     console.log('✅ Sequelize database connection has been established successfully.');
@@ -33,4 +36,4 @@ try {
     throw Error(`Unable to connect to the database: ${error}`);
 }
 
-sequelize.sync();
+sequelize.sync({ alter: true });

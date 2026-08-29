@@ -1,7 +1,15 @@
 import Boom from '@hapi/boom';
 import Joi from 'joi';
 import User from '../models/user.js';
+import Permission from '../models/permission.js';
 import mapSequelizeError from '../utils/map-sequelize-error.js';
+
+const permissionsInclude = {
+    model: Permission,
+    as: 'permissions',
+    attributes: ['name', 'description'],
+    through: { attributes: [] }
+};
 
 export default [
     {
@@ -76,7 +84,8 @@ export default [
                 try {
                     const user = await User.findOne({
                         where: { username: request.query.username },
-                        attributes: ['preferredname', 'username', 'active', 'created_at']
+                        attributes: ['preferredname', 'username', 'active', 'created_at'],
+                        include: [permissionsInclude]
                     });
                     
                     if (!user) { throw Boom.notFound('User not found'); }

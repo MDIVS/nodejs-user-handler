@@ -6,7 +6,7 @@ import Permission from '../models/permission.js';
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
 import mapSequelizeError from '../utils/map-sequelize-error.js';
-import cookie from 'cookie';
+import authenticateRequest from '../utils/authenticate-request.js';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -158,22 +158,10 @@ export default [
             description: 'Get current session user',
             handler: async (request, h) => {
                 try {
-                    const cookies = cookie.parse(request.headers.cookie || '');
-                    const session = cookies.session;
-
-                    if (!session) { return Boom.unauthorized('No session.'); }
-
-                    let decoded;
-                    try { decoded = jwt.verify(session, process.env.JWT_SECRET); }
-                    catch (err) { return Boom.unauthorized('Invalid session.'); }
-
-                    const user = await User.findOne({ where: { id: decoded.id }, include: [permissionsInclude] });
-
-                    if (!user) { return Boom.unauthorized('Invalid user.'); }
-                    if (!user.active) { return Boom.unauthorized('Deactivated user.'); }
-
+                    const user = await authenticateRequest(request);
                     return buildAuthResponsePayload(user);
                 } catch (error) {
+                    if (error.isBoom) { throw error; }
                     mapSequelizeError(error);
 
                     console.error('Error in GET /auth/me route:', error);
