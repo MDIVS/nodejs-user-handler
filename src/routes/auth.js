@@ -2,6 +2,7 @@ import Boom from '@hapi/boom';
 import Joi from 'joi';
 import User from '../models/user.js';
 import UserAuthProvider from '../models/user-auth-provider.js';
+import Permission from '../models/permission.js';
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
 import mapSequelizeError from '../utils/map-sequelize-error.js';
@@ -165,7 +166,10 @@ export default [
                     try { decoded = jwt.verify(session, process.env.JWT_SECRET); }
                     catch (err) { return Boom.unauthorized('Invalid session.'); }
 
-                    const user = await User.findOne({ where: { id: decoded.id } });
+                    const user = await User.findOne({
+                        where: { id: decoded.id },
+                        include: [{ model: Permission, as: 'permissions', attributes: ['name', 'description'], through: { attributes: [] } }]
+                    });
 
                     if (!user) { return Boom.unauthorized('User not found.'); }
                     if (!user.active) { return Boom.unauthorized('Deactivated user.'); }
@@ -179,7 +183,7 @@ export default [
                             email: user.email,
                             profile_picture_external_url: user.profile_picture_external_url
                         },
-                        permissions: []
+                        permissions: user.permissions.map(({ name, description }) => ({ name, description }))
                     };
                 } catch (error) {
                     mapSequelizeError(error);
