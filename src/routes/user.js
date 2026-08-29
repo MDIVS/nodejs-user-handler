@@ -1,5 +1,6 @@
 import Boom from '@hapi/boom';
 import Joi from 'joi';
+import { randomInt } from 'node:crypto';
 import User from '../models/user.js';
 import Permission from '../models/permission.js';
 import mapSequelizeError from '../utils/map-sequelize-error.js';
@@ -10,6 +11,16 @@ const permissionsInclude = {
     as: 'permissions',
     attributes: ['name', 'description'],
     through: { attributes: [] }
+};
+
+const TEMPORARY_PASSWORD_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+const generateTemporaryPassword = (length = 8) => {
+    let password = '';
+    for (let i = 0; i < length; i++) {
+        password += TEMPORARY_PASSWORD_CHARS[randomInt(TEMPORARY_PASSWORD_CHARS.length)];
+    }
+    return password;
 };
 
 const setUserActiveState = (active) => async (request) => {
@@ -212,6 +223,46 @@ export default [
                 }).required()
             },
             handler: setUserActiveState(false)
+        }
+    },
+    {
+        path: '/user/reset-password',
+        method: 'POST',
+        options: {
+            tags: ['api'],
+            description: 'Generate a temporary password for a user (admin only)',
+            validate: {
+                query: Joi.object({
+                    username: Joi.string().required().example('johnsmith')
+                }).required()
+            },
+            handler: async (request) => {
+                try {
+                    const requester = await authenticateRequest(request);
+                    if (!requester.permissions.some((perm) => perm.name === 'admin')) {
+                        throw Boom.forbidden('Only an admin can reset a user\'s password.');
+                    }
+
+                    const { username } = request.query;
+
+                    const userRecord = await User.findOne({ where: { username } });
+                    if (!userRecord) { throw Boom.notFound('User not found'); }
+
+                    const temporaryPassword = generateTemporaryPassword();
+                    await userRecord.update({ temporary_password: temporaryPassword });
+
+                    return {
+                        message: 'Temporary password generated.',
+                        temporary_password: temporaryPassword
+                    };
+                } catch (error) {
+                    if (error.isBoom) { throw error; }
+                    mapSequelizeError(error);
+
+                    console.log('Error in POST /user/reset-password route:', error);
+                    throw Boom.internal();
+                }
+            }
         }
     }
 ];

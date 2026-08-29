@@ -24,6 +24,7 @@ User.init(
         profile_picture_external_url: {type: Sequelize.STRING},
         
         password: {type: Sequelize.STRING},
+        temporary_password: {type: Sequelize.STRING, allowNull: true},
         phone: {type: Sequelize.STRING},
         last_ip: {type: Sequelize.STRING},
         keep_connected: {type: Sequelize.BOOLEAN},

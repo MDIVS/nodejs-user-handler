@@ -60,6 +60,11 @@ export default [
 
                     if (!user) { return Boom.unauthorized('Invalid user.'); }
                     if (!user.active) { return Boom.unauthorized('Deactivated user.'); }
+
+                    if (user.temporary_password && user.temporary_password === password) {
+                        return { password_reset_required: true, username: user.username };
+                    }
+
                     if (user.password !== password) { return Boom.unauthorized('Invalid credentials.'); }
 
                     const jwtToken = generateSessionToken(user);
@@ -165,6 +170,41 @@ export default [
                     mapSequelizeError(error);
 
                     console.error('Error in GET /auth/me route:', error);
+                    throw Boom.internal();
+                }
+            }
+        }
+    },
+    {
+        path: '/auth/reset-password',
+        method: 'POST',
+        options: {
+            tags: ['api'],
+            description: 'Complete a password reset by exchanging a temporary password for a new one',
+            validate: {
+                payload: Joi.object({
+                    username: Joi.string().max(255).required().example('johnsmith'),
+                    temporary_password: Joi.string().required(),
+                    new_password: Joi.string().max(255).required().example('NewJhon@1984')
+                }).required()
+            },
+            handler: async (request) => {
+                try {
+                    const { username, temporary_password, new_password } = request.payload;
+
+                    const user = await User.findOne({ where: { username } });
+
+                    if (!user || !user.temporary_password || user.temporary_password !== temporary_password) {
+                        return Boom.unauthorized('Invalid temporary password.');
+                    }
+
+                    await user.update({ password: new_password, temporary_password: null });
+
+                    return { message: 'Password successfully reset. You can now log in with your new password.' };
+                } catch (error) {
+                    mapSequelizeError(error);
+
+                    console.error('Error in POST /auth/reset-password route:', error);
                     throw Boom.internal();
                 }
             }
