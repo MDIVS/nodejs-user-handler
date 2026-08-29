@@ -26,9 +26,6 @@ const generateSessionToken = (user) => jwt.sign(
 const buildUserPayload = (user) => ({
     id: user.id,
     preferredname: user.preferredname,
-    firstname: user.firstname,
-    middlename: user.middlename,
-    lastname: user.lastname,
     fullname: user.fullname,
     username: user.username,
     email: user.email,
