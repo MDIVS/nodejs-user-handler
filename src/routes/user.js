@@ -3,12 +3,40 @@ import Joi from 'joi';
 import User from '../models/user.js';
 import Permission from '../models/permission.js';
 import mapSequelizeError from '../utils/map-sequelize-error.js';
+import authenticateRequest from '../utils/authenticate-request.js';
 
 const permissionsInclude = {
     model: Permission,
     as: 'permissions',
     attributes: ['name', 'description'],
     through: { attributes: [] }
+};
+
+const setUserActiveState = (active) => async (request) => {
+    try {
+        const requester = await authenticateRequest(request);
+        if (!requester.permissions.some((perm) => perm.name === 'admin')) {
+            throw Boom.forbidden('Only an admin can activate or deactivate users.');
+        }
+
+        const { username } = request.query;
+
+        const userRecord = await User.findOne({ where: { username } });
+        if (!userRecord) { throw Boom.notFound('User not found'); }
+
+        await userRecord.update({ active });
+
+        return {
+            message: `User successfully ${active ? 'activated' : 'deactivated'}.`,
+            user: { username: userRecord.username, active: userRecord.active }
+        };
+    } catch (error) {
+        if (error.isBoom) { throw error; }
+        mapSequelizeError(error);
+
+        console.log(`Error in POST /user/${active ? 'activate' : 'deactivate'} route:`, error);
+        throw Boom.internal();
+    }
 };
 
 export default [
@@ -156,6 +184,34 @@ export default [
                     throw Boom.internal();
                 }
             }
+        }
+    },
+    {
+        path: '/user/activate',
+        method: 'POST',
+        options: {
+            tags: ['api'],
+            description: 'Activate a user',
+            validate: {
+                query: Joi.object({
+                    username: Joi.string().required().example('johnsmith')
+                }).required()
+            },
+            handler: setUserActiveState(true)
+        }
+    },
+    {
+        path: '/user/deactivate',
+        method: 'POST',
+        options: {
+            tags: ['api'],
+            description: 'Deactivate a user',
+            validate: {
+                query: Joi.object({
+                    username: Joi.string().required().example('johnsmith')
+                }).required()
+            },
+            handler: setUserActiveState(false)
         }
     }
 ];
